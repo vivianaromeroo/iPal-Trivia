@@ -73,7 +73,12 @@ public class MainActivity extends AppCompatActivity {
 
     // Display the next question from the list
     private void displayNextQuestion() {
+
         if (currentQuestionIndex < triviaQuestions.getSize()) {
+            // Enable true/false buttons
+            trueButton.setEnabled(true);
+            falseButton.setEnabled(true);
+
             String text = "Question #" + (currentQuestionIndex + 1);
             questionNumberTextView.setText(text);
 
@@ -128,6 +133,10 @@ public class MainActivity extends AppCompatActivity {
         // Show answer + explanation
         String explanation = currentQuestion.getExplanation();
         questionTextView.setText("Answer: " + explanation);
+
+        // Disable buttons until next question
+        trueButton.setEnabled(false);
+        falseButton.setEnabled(false);
 
         // Move to the next question after 5 seconds
         currentQuestionIndex++;
