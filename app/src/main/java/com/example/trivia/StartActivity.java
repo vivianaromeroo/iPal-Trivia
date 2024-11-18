@@ -16,6 +16,8 @@ public class StartActivity extends AppCompatActivity {
         // Get the start button
         Button startButton = (Button) findViewById(R.id.startButton);
 
+        Button exitButton = (Button) findViewById(R.id.exitButton);
+
         // Set up the button click listener
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -26,6 +28,13 @@ public class StartActivity extends AppCompatActivity {
 
                 // Optional: Close the StartActivity so the user cannot return to it
                 finish();
+            }
+        });
+
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // Exit the app when the button is clicked
             }
         });
     }

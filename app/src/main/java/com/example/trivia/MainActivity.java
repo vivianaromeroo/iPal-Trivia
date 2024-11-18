@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     //Buttons
     private Button trueButton;
     private Button falseButton;
-    private Button exitButton;
+    private Button exitButtonMain;
 
     // Variables to keep track of question # + correct answers
     private int currentQuestionIndex = 0;
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         timerTextView = (TextView) findViewById(R.id.timerTextView);
         trueButton = (Button) findViewById(R.id.trueButton);
         falseButton = (Button) findViewById(R.id.falseButton);
-        exitButton = (Button) findViewById(R.id.exitButton);
+        exitButtonMain = (Button) findViewById(R.id.exitButtonMain);
 
         // Display the first question
         displayNextQuestion(); // GAME STARTS HERE
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        exitButton.setOnClickListener(new View.OnClickListener() {
+        exitButtonMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish(); // Exit the app when the button is clicked

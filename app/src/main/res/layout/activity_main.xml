@@ -55,11 +55,12 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/exitButton"
+        android:id="@+id/exitButtonMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
         android:text="Exit" />
+
 </LinearLayout>
