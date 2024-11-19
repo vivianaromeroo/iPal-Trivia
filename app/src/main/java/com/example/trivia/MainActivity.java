@@ -8,6 +8,10 @@ import android.widget.TextView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.CountDownTimer;
 
+import android.robot.speech.SpeechManager;
+import android.robot.speech.SpeechManager.TtsListener;
+import android.robot.speech.SpeechService;
+
 public class MainActivity extends AppCompatActivity {
 
     // Text Views
@@ -32,6 +36,27 @@ public class MainActivity extends AppCompatActivity {
     private long timeLeftInMillis = 10000;
     private Handler handler = new Handler();
 
+    // SpeechManager
+    private SpeechManager mSpeechManager;
+
+    private TtsListener mTtsListener = new TtsListener() {
+        @Override
+        public void onBegin(int requestId) {
+            // Log or handle speech beginning
+        }
+
+        @Override
+        public void onEnd(int requestId) {
+            // Log or handle speech ending
+        }
+
+        @Override
+        public void onError(int error) {
+            // Log or handle speech errors
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
         trueButton = (Button) findViewById(R.id.trueButton);
         falseButton = (Button) findViewById(R.id.falseButton);
         exitButtonMain = (Button) findViewById(R.id.exitButtonMain);
+
+        // Initialize SpeechManager
+        initSpeechManager();
 
         // Display the first question
         displayNextQuestion(); // GAME STARTS HERE
@@ -66,9 +94,18 @@ public class MainActivity extends AppCompatActivity {
         exitButtonMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish(); // Exit the app when the button is clicked
+                mSpeechManager.stopSpeaking(-1);
+                finish();
+                System.exit(0);// Exit the app when the button is clicked
             }
         });
+    }
+
+    private void initSpeechManager() {
+        mSpeechManager = (SpeechManager) getSystemService(SpeechService.SERVICE_NAME);
+        if (mSpeechManager != null) {
+            mSpeechManager.setTtsListener(mTtsListener);
+        }
     }
 
     // Display the next question from the list
@@ -84,6 +121,9 @@ public class MainActivity extends AppCompatActivity {
 
             TriviaQuestion currentQuestion = triviaQuestions.getQuestion(currentQuestionIndex);
             questionTextView.setText(currentQuestion.getQuestion());
+
+            // Speak the question
+            speak(currentQuestion.getQuestion());
 
             timerTextView.setText("Time left: 10 seconds");
             timeLeftInMillis = 10000;
@@ -115,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Validate the user's answer
+    String feedback;
     private void validateAnswer(String userAnswer) {
         if (countDownTimer != null) {
             countDownTimer.cancel(); // Stop the timer when the answer is selected
@@ -125,9 +166,13 @@ public class MainActivity extends AppCompatActivity {
         if (userAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer())) {
             correctAnswers++;
 
-            timerTextView.setText("Good job!");
+            feedback = "Good job!";
+            timerTextView.setText(feedback);
+            speak(feedback);
         } else {
-            timerTextView.setText("Better luck next time.");
+            feedback = "Better luck next time.";
+            timerTextView.setText(feedback);
+            speak(feedback);
         }
 
         // Show answer + explanation
@@ -155,5 +200,19 @@ public class MainActivity extends AppCompatActivity {
         questionTextView.setText(results);
 
         timerTextView.setText("");
+    }
+
+    private void speak(String text) {
+        if (mSpeechManager != null && text != null) {
+            mSpeechManager.startSpeaking(text);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mSpeechManager != null) {
+            mSpeechManager.stopSpeaking(-1);
+        }
     }
 }
