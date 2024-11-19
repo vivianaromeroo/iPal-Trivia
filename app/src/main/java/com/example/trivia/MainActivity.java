@@ -11,6 +11,7 @@ import android.os.CountDownTimer;
 import android.robot.speech.SpeechManager;
 import android.robot.speech.SpeechManager.TtsListener;
 import android.robot.speech.SpeechService;
+import android.robot.motion.RobotMotion;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     // SpeechManager
     private SpeechManager mSpeechManager;
+    private RobotMotion mRobotMotion = new RobotMotion();
 
     private TtsListener mTtsListener = new TtsListener() {
         @Override
@@ -166,10 +168,14 @@ public class MainActivity extends AppCompatActivity {
         if (userAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer())) {
             correctAnswers++;
 
+//            mRobotMotion.doAction(RobotMotion.Action.CHEER);
+            mRobotMotion.nodHead();
             feedback = "Good job!";
             timerTextView.setText(feedback);
             speak(feedback);
         } else {
+//            mRobotMotion.doAction(RobotMotion.Action.WORRY);
+            mRobotMotion.shakeHead();
             feedback = "Better luck next time.";
             timerTextView.setText(feedback);
             speak(feedback);
@@ -177,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Show answer + explanation
         String explanation = currentQuestion.getExplanation();
-        questionTextView.setText("Answer: " + explanation);
+        questionTextView.setText(explanation);
 
         // Disable buttons until next question
         trueButton.setEnabled(false);
@@ -188,18 +194,38 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                mRobotMotion.stop();
+
                 displayNextQuestion();
             }
         }, 5000);
     }
 
     private void endGame() {
+        String gameFeedback;
+        if (correctAnswers >= 9) {
+            gameFeedback = "Excellent! You nailed it! You are a trivia master!";
+            mRobotMotion.doAction(RobotMotion.Action.CHEER);
+        } else if (correctAnswers >= 7) {
+            gameFeedback = "Great job! You're almost there!";
+            mRobotMotion.doAction(RobotMotion.Action.CLAP);
+        } else if (correctAnswers >= 5) {
+            gameFeedback = "Good effort! High five!";
+            mRobotMotion.doAction(RobotMotion.Action.HIGHFIVE);
+        } else if (correctAnswers >= 3) {
+            gameFeedback = "Not bad, but you can do better!";
+            mRobotMotion.doAction(RobotMotion.Action.SALUTE);
+        } else {
+            gameFeedback = "Better luck next time. Keep practicing!";
+            mRobotMotion.doAction(RobotMotion.Action.NO);
+        }
+        timerTextView.setText(gameFeedback);
+        mSpeechManager.startSpeaking(gameFeedback);
+
         // Show the results
         questionNumberTextView.setText("Game Over!");
         String results = "Correct answers: " + correctAnswers + " / " + triviaQuestions.getSize();
         questionTextView.setText(results);
-
-        timerTextView.setText("");
     }
 
     private void speak(String text) {
