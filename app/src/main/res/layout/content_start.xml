@@ -4,14 +4,14 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
-    android:background="#FFF9E3">
+    android:background="#E9C46A">
 
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Welcome to Trivia!"
-        android:textSize="24sp"
+        android:textSize="48sp"
         android:textStyle="bold"
         android:textColor="#333"
         android:gravity="center"
@@ -22,8 +22,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Test your knowledge and have fun!"
-        android:textSize="16sp"
-        android:textColor="#666"
+        android:textSize="32sp"
+        android:textColor="#555"
         android:gravity="center"
         android:layout_marginBottom="32dp" />
 
@@ -32,8 +32,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start Game"
-        android:backgroundTint="#FF9800"
-        android:textColor="#FFF" />
+        android:textSize="32sp"
+        android:backgroundTint="#2A9D8F"
+        android:textColor="#333" />
 
     <Button
         android:id="@+id/exitButton"
@@ -42,5 +43,8 @@
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
-        android:text="Exit" />
+        android:backgroundTint="#E76F51"
+        android:text="Exit Game"
+        android:textSize="32sp"
+        android:textColor="#333" />
 </LinearLayout>

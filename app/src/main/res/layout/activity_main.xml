@@ -3,14 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#E9C46A">
 
     <TextView
         android:id="@+id/questionNumberTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Question #"
-        android:textSize="18sp"
+        android:textColor="#333"
+        android:textSize="40sp"
         android:gravity="center"
         android:padding="16dp" />
 
@@ -19,7 +21,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Question will appear here"
-        android:textSize="18sp"
+        android:textColor="#333"
+        android:textSize="34sp"
         android:gravity="center"
         android:padding="16dp" />
 
@@ -28,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Time left: 10 seconds"
-        android:textSize="16sp"
+        android:textSize="34sp"
         android:gravity="center"
         android:layout_gravity="center"
         android:padding="8dp" />
@@ -44,14 +47,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="True"
-            android:layout_margin="8dp" />
+            android:textColor="#222"
+            android:textSize="40sp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#2A9D8F"/>
 
         <Button
             android:id="@+id/falseButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="False"
-            android:layout_margin="8dp" />
+            android:textColor="#222"
+            android:textSize="40sp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#E76F51"/>
     </LinearLayout>
 
     <Button
@@ -61,6 +70,7 @@
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
-        android:text="Exit" />
+        android:text="Exit"
+        android:textSize="30sp"/>
 
 </LinearLayout>

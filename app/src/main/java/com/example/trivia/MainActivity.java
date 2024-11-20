@@ -37,24 +37,21 @@ public class MainActivity extends AppCompatActivity {
     private long timeLeftInMillis = 10000;
     private Handler handler = new Handler();
 
-    // SpeechManager
+    // Required to use speech + motion
     private SpeechManager mSpeechManager;
     private RobotMotion mRobotMotion = new RobotMotion();
 
     private TtsListener mTtsListener = new TtsListener() {
         @Override
         public void onBegin(int requestId) {
-            // Log or handle speech beginning
         }
 
         @Override
         public void onEnd(int requestId) {
-            // Log or handle speech ending
         }
 
         @Override
         public void onError(int error) {
-            // Log or handle speech errors
         }
     };
 
@@ -76,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         initSpeechManager();
 
         // Display the first question
-        displayNextQuestion(); // GAME STARTS HERE
+        displayNextQuestion();
 
         // Set button listeners for user input
         trueButton.setOnClickListener(new View.OnClickListener() {
@@ -96,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
         exitButtonMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Exit the app when the button is clicked
                 mSpeechManager.stopSpeaking(-1);
                 finish();
-                System.exit(0);// Exit the app when the button is clicked
+                System.exit(0);
             }
         });
     }
@@ -168,13 +166,11 @@ public class MainActivity extends AppCompatActivity {
         if (userAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer())) {
             correctAnswers++;
 
-//            mRobotMotion.doAction(RobotMotion.Action.CHEER);
             mRobotMotion.nodHead();
             feedback = "Good job!";
             timerTextView.setText(feedback);
             speak(feedback);
         } else {
-//            mRobotMotion.doAction(RobotMotion.Action.WORRY);
             mRobotMotion.shakeHead();
             feedback = "Better luck next time.";
             timerTextView.setText(feedback);
@@ -220,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
             mRobotMotion.doAction(RobotMotion.Action.NO);
         }
         timerTextView.setText(gameFeedback);
-        mSpeechManager.startSpeaking(gameFeedback);
+        speak(gameFeedback);
 
         // Show the results
         questionNumberTextView.setText("Game Over!");
