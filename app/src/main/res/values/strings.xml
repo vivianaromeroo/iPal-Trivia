@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Trivia</string>
-    <string name="title_activity_start">Start Screen</string>
+    <string name="title_activity_start">Trivia!</string>
 </resources>
 
