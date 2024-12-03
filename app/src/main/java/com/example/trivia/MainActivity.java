@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.CountDownTimer;
+import android.content.Context;
 
 import android.robot.speech.SpeechManager;
 import android.robot.speech.SpeechManager.TtsListener;
@@ -15,53 +16,32 @@ import android.robot.motion.RobotMotion;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Text Views
-    private TextView questionNumberTextView;
-    private TextView questionTextView;
-    private TextView timerTextView;
-
-    //Buttons
-    private Button trueButton;
-    private Button falseButton;
-    private Button exitButtonMain;
-
-    // Variables to keep track of question # + correct answers
-    private int currentQuestionIndex = 0;
-    private int correctAnswers = 0;
-
-    // List of trivia questions
-    private TriviaQuestions triviaQuestions = new TriviaQuestions();
-
-    // For countdown + delay between questions
-    private CountDownTimer countDownTimer;
-    private long timeLeftInMillis = 10000;
+    private QuestionManager questionManager;
+    private TimerManager timerManager;
     private Handler handler = new Handler();
 
-    // Required to use speech + motion
+    private TextView questionNumberTextView, questionTextView, timerTextView;
+    private Button trueButton, falseButton, exitButtonMain;
+
     private SpeechManager mSpeechManager;
     private RobotMotion mRobotMotion = new RobotMotion();
-
     private TtsListener mTtsListener = new TtsListener() {
         @Override
-        public void onBegin(int requestId) {
-        }
+        public void onBegin(int requestId) {}
 
         @Override
-        public void onEnd(int requestId) {
-        }
+        public void onEnd(int requestId) {}
 
         @Override
-        public void onError(int error) {
-        }
+        public void onError(int error) {}
     };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize the views
+        // Initialize Views
         questionNumberTextView = (TextView) findViewById(R.id.questionNumberTextView);
         questionTextView = (TextView) findViewById(R.id.questionTextView);
         timerTextView = (TextView) findViewById(R.id.timerTextView);
@@ -69,13 +49,13 @@ public class MainActivity extends AppCompatActivity {
         falseButton = (Button) findViewById(R.id.falseButton);
         exitButtonMain = (Button) findViewById(R.id.exitButtonMain);
 
-        // Initialize SpeechManager
+        // Initialize Helpers
+        questionManager = new QuestionManager(new TriviaQuestions(), this);
+        timerManager = new TimerManager(timerTextView);
+
         initSpeechManager();
 
-        // Display the first question
-        displayNextQuestion();
-
-        // Set button listeners for user input
+        // Set Button Listeners
         trueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,11 +74,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Exit the app when the button is clicked
-                mSpeechManager.stopSpeaking(-1);
                 finish();
                 System.exit(0);
             }
         });
+
+        // Start the first question
+        displayNextQuestion();
     }
 
     private void initSpeechManager() {
@@ -108,85 +90,47 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Display the next question from the list
     private void displayNextQuestion() {
-
-        if (currentQuestionIndex < triviaQuestions.getSize()) {
-            // Enable true/false buttons
-            trueButton.setEnabled(true);
-            falseButton.setEnabled(true);
-
-            String text = "Question #" + (currentQuestionIndex + 1);
-            questionNumberTextView.setText(text);
-
-            TriviaQuestion currentQuestion = triviaQuestions.getQuestion(currentQuestionIndex);
+        TriviaQuestion currentQuestion = questionManager.getNextQuestion();
+        if (currentQuestion != null) {
+            questionNumberTextView.setText("Question #" + questionManager.getCurrentQuestionNumber());
             questionTextView.setText(currentQuestion.getQuestion());
-
-            // Speak the question
-            speak(currentQuestion.getQuestion());
-
-            timerTextView.setText("Time left: 10 seconds");
-            timeLeftInMillis = 10000;
-            startTimer();
-
+            mSpeechManager.startSpeaking(currentQuestion.getQuestion());
+            timerManager.startTimer(new Runnable() {
+                @Override
+                public void run() {
+                    questionManager.validateAnswer("Timeout");
+                    mRobotMotion.shakeHead();
+                    displayNextQuestion();
+                }
+            });
         } else {
             endGame();
         }
     }
 
-    private void startTimer() {
-        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
-
-            @Override
-            public void onTick(long millisUntilFinished) {
-                // Update the timer display each second
-                timeLeftInMillis = millisUntilFinished;
-                int secondsLeft = (int) (timeLeftInMillis / 1000);
-                timerTextView.setText("Time left: " + secondsLeft + " seconds");
-            }
-
-            @Override
-            public void onFinish() {
-                // When the time finishes, show a message and move to the next question
-                timerTextView.setText("Time's up!");
-                validateAnswer("Timeout");
-            }
-        }.start();
-    }
-
-    // Validate the user's answer
-    String feedback;
     private void validateAnswer(String userAnswer) {
-        if (countDownTimer != null) {
-            countDownTimer.cancel(); // Stop the timer when the answer is selected
-        }
+        mSpeechManager.stopSpeaking(-1);
+        questionTextView.setText(questionManager.getNextQuestion().getExplanation());
 
-        // If answer is correct, add to score
-        TriviaQuestion currentQuestion = triviaQuestions.getQuestion(currentQuestionIndex);
-        if (userAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer())) {
-            correctAnswers++;
+        boolean isCorrect = questionManager.validateAnswer(userAnswer);
+        timerManager.stopTimer();
+        String feedback;
 
+        if (isCorrect) {
             mRobotMotion.nodHead();
+
             feedback = "Good job!";
             timerTextView.setText(feedback);
-            speak(feedback);
+            mSpeechManager.startSpeaking(feedback);
         } else {
             mRobotMotion.shakeHead();
+
             feedback = "Better luck next time.";
             timerTextView.setText(feedback);
-            speak(feedback);
+            mSpeechManager.startSpeaking(feedback);
         }
 
-        // Show answer + explanation
-        String explanation = currentQuestion.getExplanation();
-        questionTextView.setText(explanation);
-
-        // Disable buttons until next question
-        trueButton.setEnabled(false);
-        falseButton.setEnabled(false);
-
-        // Move to the next question after 5 seconds
-        currentQuestionIndex++;
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -198,43 +142,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void endGame() {
-        String gameFeedback;
-        if (correctAnswers >= 9) {
-            gameFeedback = "Excellent! You nailed it! You are a trivia master!";
+        String feedback = questionManager.getFinalFeedback();
+        questionTextView.setText(feedback);
+        mSpeechManager.startSpeaking(feedback);
+
+        if (feedback.contains("Excellent")) {
             mRobotMotion.doAction(RobotMotion.Action.CHEER);
-        } else if (correctAnswers >= 7) {
-            gameFeedback = "Great job! You're almost there!";
+        }
+        else if (feedback.contains("Great")) {
             mRobotMotion.doAction(RobotMotion.Action.CLAP);
-        } else if (correctAnswers >= 5) {
-            gameFeedback = "Good effort! High five!";
+        }
+        else if (feedback.contains("Good")) {
             mRobotMotion.doAction(RobotMotion.Action.HIGHFIVE);
-        } else if (correctAnswers >= 3) {
-            gameFeedback = "Not bad, but you can do better!";
-            mRobotMotion.doAction(RobotMotion.Action.SALUTE);
-        } else {
-            gameFeedback = "Better luck next time. Keep practicing!";
+        }
+        else {
             mRobotMotion.doAction(RobotMotion.Action.NO);
         }
-        timerTextView.setText(gameFeedback);
-        speak(gameFeedback);
 
-        // Show the results
         questionNumberTextView.setText("Game Over!");
-        String results = "Correct answers: " + correctAnswers + " / " + triviaQuestions.getSize();
-        questionTextView.setText(results);
+        questionTextView.setText(questionManager.finalScoreText());
     }
 
-    private void speak(String text) {
-        if (mSpeechManager != null && text != null) {
-            mSpeechManager.startSpeaking(text);
-        }
+    private void exitApp() {
+        mSpeechManager.stopSpeaking(-1);
+        finish();
+        System.exit(0);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mSpeechManager != null) {
-            mSpeechManager.stopSpeaking(-1);
-        }
+        mSpeechManager.stopSpeaking(-1);
     }
 }
