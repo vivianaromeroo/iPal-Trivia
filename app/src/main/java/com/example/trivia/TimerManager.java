@@ -15,7 +15,7 @@ public class TimerManager {
         countDownTimer = new CountDownTimer(10000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                timerTextView.setText("Time left: " + millisUntilFinished / 1000 + " seconds");
+                timerTextView.setText("Time left: " + millisUntilFinished / 1100 + " seconds");
             }
 
             @Override

@@ -6,8 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.CountDownTimer;
-import android.content.Context;
+import android.content.Intent;
 
 import android.robot.speech.SpeechManager;
 import android.robot.speech.SpeechManager.TtsListener;
@@ -18,13 +17,13 @@ public class MainActivity extends AppCompatActivity {
 
     private QuestionManager questionManager;
     private TimerManager timerManager;
-    private Handler handler = new Handler();
+    private Handler handler;
 
     private TextView questionNumberTextView, questionTextView, timerTextView;
     private Button trueButton, falseButton, exitButtonMain;
 
     private SpeechManager mSpeechManager;
-    private RobotMotion mRobotMotion = new RobotMotion();
+    private RobotMotion mRobotMotion;
     private TtsListener mTtsListener = new TtsListener() {
         @Override
         public void onBegin(int requestId) {}
@@ -52,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Helpers
         questionManager = new QuestionManager(new TriviaQuestions(), this);
         timerManager = new TimerManager(timerTextView);
+        handler = new Handler();
+        mRobotMotion = new RobotMotion();
 
         initSpeechManager();
 
@@ -73,13 +74,10 @@ public class MainActivity extends AppCompatActivity {
         exitButtonMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Exit the app when the button is clicked
-                finish();
-                System.exit(0);
+                exitApp();
             }
         });
 
-        // Start the first question
         displayNextQuestion();
     }
 
@@ -91,17 +89,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayNextQuestion() {
+
+
         TriviaQuestion currentQuestion = questionManager.getNextQuestion();
         if (currentQuestion != null) {
+            trueButton.setEnabled(true);
+            falseButton.setEnabled(true);
+
             questionNumberTextView.setText("Question #" + questionManager.getCurrentQuestionNumber());
             questionTextView.setText(currentQuestion.getQuestion());
             mSpeechManager.startSpeaking(currentQuestion.getQuestion());
             timerManager.startTimer(new Runnable() {
                 @Override
                 public void run() {
-                    questionManager.validateAnswer("Timeout");
-                    mRobotMotion.shakeHead();
-                    displayNextQuestion();
+                    validateAnswer("Timeout");
                 }
             });
         } else {
@@ -110,11 +111,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void validateAnswer(String userAnswer) {
+        trueButton.setEnabled(false);
+        falseButton.setEnabled(false);
+
         mSpeechManager.stopSpeaking(-1);
+        timerManager.stopTimer();
         questionTextView.setText(questionManager.getNextQuestion().getExplanation());
 
         boolean isCorrect = questionManager.validateAnswer(userAnswer);
-        timerManager.stopTimer();
         String feedback;
 
         if (isCorrect) {
@@ -135,32 +139,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 mRobotMotion.stop();
-
                 displayNextQuestion();
             }
         }, 5000);
     }
 
     private void endGame() {
-        String feedback = questionManager.getFinalFeedback();
-        questionTextView.setText(feedback);
-        mSpeechManager.startSpeaking(feedback);
+        // Launch the EndActivity
+        Intent intent = new Intent(MainActivity.this, EndActivity.class);
+        intent.putExtra("SCORE_TEXT", questionManager.finalScoreText());
+        intent.putExtra("FEEDBACK", questionManager.getFinalFeedback());
+        startActivity(intent);
 
-        if (feedback.contains("Excellent")) {
-            mRobotMotion.doAction(RobotMotion.Action.CHEER);
-        }
-        else if (feedback.contains("Great")) {
-            mRobotMotion.doAction(RobotMotion.Action.CLAP);
-        }
-        else if (feedback.contains("Good")) {
-            mRobotMotion.doAction(RobotMotion.Action.HIGHFIVE);
-        }
-        else {
-            mRobotMotion.doAction(RobotMotion.Action.NO);
-        }
-
-        questionNumberTextView.setText("Game Over!");
-        questionTextView.setText(questionManager.finalScoreText());
+        finish();
     }
 
     private void exitApp() {

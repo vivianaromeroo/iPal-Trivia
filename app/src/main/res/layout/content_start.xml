@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Welcome to Trivia!"
-        android:textSize="48sp"
+        android:textSize="68sp"
         android:textStyle="bold"
         android:textColor="#333"
         android:gravity="center"
@@ -22,29 +22,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Test your knowledge and have fun!"
-        android:textSize="32sp"
+        android:textSize="52sp"
         android:textColor="#555"
         android:gravity="center"
-        android:layout_marginBottom="32dp" />
+        android:layout_marginBottom="50dp" />
 
     <Button
         android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:text="Start Game"
-        android:textSize="32sp"
+        android:textSize="42sp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="#2A9D8F"
-        android:textColor="#333" />
+        android:textColor="#333"
+        android:padding="16dp" />
 
     <Button
         android:id="@+id/exitButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
         android:backgroundTint="#E76F51"
         android:text="Exit Game"
-        android:textSize="32sp"
-        android:textColor="#333" />
+        android:textSize="42sp"
+        android:textColor="#333"
+        android:padding="16dp" />
 </LinearLayout>

@@ -19,7 +19,7 @@
     <TextView
         android:id="@+id/questionTextView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="170dp"
         android:text="Question will appear here"
         android:textColor="#333"
         android:textSize="54sp"
@@ -40,25 +40,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="25dp">
 
         <Button
             android:id="@+id/trueButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="350dp"
+            android:layout_height="150dp"
             android:text="True"
             android:textColor="#222"
-            android:textSize="60sp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="100dp"
+            android:textSize="80sp"
             android:layout_margin="8dp"
             android:backgroundTint="#2A9D8F"/>
 
         <Button
             android:id="@+id/falseButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="350dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="100dp"
             android:text="False"
             android:textColor="#222"
-            android:textSize="60sp"
+            android:layout_marginLeft="20dp"
+            android:textSize="80sp"
             android:layout_margin="8dp"
             android:backgroundTint="#E76F51"/>
     </LinearLayout>
@@ -66,10 +71,9 @@
     <Button
         android:id="@+id/exitButtonMain"
         android:layout_width="wrap_content"
+        android:layout_marginTop="100dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_gravity="center"
-        android:layout_marginBottom="16dp"
         android:text="Exit"
         android:textSize="40sp"/>
 
